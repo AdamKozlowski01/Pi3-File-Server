@@ -10,6 +10,9 @@
 
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <unistd.h>
+#include "ConnectionHandler.h"
+#include "ThreadPool.h"
 
 class Server{
 /* The Server Interface */
@@ -27,24 +30,44 @@ class FileServer_v1: public Server{
 private:
 	/* Systems go here */
 	struct sockaddr_in servaddr;
+	ThreadPool* deadPool;
+	ConnectionHandler* cHandler;
 
 	~FileServer_v1(){
 		//Tear Down
-		//TO-DO
 	}
 protected:
 public:
 	FileServer_v1(){
 		//Setup
-		//TO-DO
+		port = 1081;
+
+		socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+		bzero(&servaddr, sizeof(servaddr));
+
+		servaddr.sin_family = AF_INET;
+		servaddr.sin_addr.s = htons(INADDR_ANY);
+		servaddr.sin_port = htons(port);
+		
+		deadPool = new ThreadPool_v1();
+		cHandler = new ConnectionHandler_v1(socket_fd);
+
+		bind(socket_fd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 	}
+
 	void run(){
 		//Starts the server
-		//TO-DO
+		listen(server_fd, 20);
+		while(true){
+			cHandler.handle();
+		}
 
 	} 
+
 	void shutdown(){
 		//safely shuts down the server
-		//TO-DO
+		close(server_fd);
+		~FileServer_v1();
 	} 
 };
