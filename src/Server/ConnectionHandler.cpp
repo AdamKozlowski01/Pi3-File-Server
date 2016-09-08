@@ -27,6 +27,7 @@ private:
 	//Sub-systems go here
 		//Connection Factory
 		//Pointer to Thread-Pool?
+		//vector or list of connections
 
 	std::string connErrMsg = "Could Not Accept Connection\n";
 

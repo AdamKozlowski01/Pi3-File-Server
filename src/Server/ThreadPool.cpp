@@ -13,6 +13,7 @@
 
 #include <pthread.h>
 #include <vector>
+#include <iostream>
 
 class ThreadPool{
 private:
@@ -58,7 +59,8 @@ public:
 				return threadIndex;
 			}
 			else{
-				return thread_error;
+				std::cerr << "Error Allocating Thread : " << i << std::endl;
+				return -1;
 			}
 		}
 		else{
