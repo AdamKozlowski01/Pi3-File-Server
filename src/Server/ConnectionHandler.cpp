@@ -7,49 +7,37 @@
 *
 *********************************************/
 
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <string.h>
-#include <iostream.h>
+#include "ConnectionHandler.h"
 
-class ConnectionHandler{
-//Abstract Connection Handler
-private:
-protected:
-	int socket_fd, conn_fd;
-public:
-	virtual void handle() = 0;
-};
 
-class FileConnectionHandler_v1: public ConnectionHandler{
-//Implementation of Connection Handler
-private:
-	//Sub-systems go here
-		//Connection Factory
-		//Pointer to Thread-Pool?
-		//vector or list of connections
+FileConnectionHandler_v1::FileConnectionHandler_v1(int socketfd, ThreadPool& tp){
+	//set up
+	socket_fd = socketfd;
+	deadPool = tp;
+	connMaker = new EchoFactory(deadPool);
+	connections = new std::vector<Connection*>;
+}
+FileConnectionHandler_v1::~FileConnectionHandler_v1(){
+	//tear down'
 
-	std::string connErrMsg = "Could Not Accept Connection\n";
+	delete connMaker;
+	delete connections;
+}
+void FileConnectionHandler_v1::handle(){
+	//handles accept() and requests thread resources
+	conn_fd = accept(socket_fd, (struct sockaddr *) NULL, NULL);
 
-protected:
-public:
-
-	FileConnectionHandler_v1(int socketfd){
-		//set up
-		socket_fd = socketfd;
+	if(conn_fd < 0){
+		std::cerr << connErrMsg;
 	}
-	~FileConnectionHandler_v1(){
-		//tear down
+	else{
+		//get a new thread and process the connection
+		connections->push_back(connMaker->createConnection(conn_fd));
 	}
-	void handle(){
-		//handles accept() and requests thread resources
-		conn_fd = accept(socket_fd, (struct sockaddr *) NULL, NULL);
 
-		if(conn_fd < 0){
-			std::cerr << connErrMsg;
-		}
-		else{
-			//get a new thread and process the connection
-		}
+	//iterate through the list of connections, for any not running delete the pointers
+	for(int i = 0; i < connections->size(); i++){ //Could maybe be put in it's own thread?
+		if(!connections[i]->isRunning())
+			connections[i]->endConnection();
 	}
-};
+}

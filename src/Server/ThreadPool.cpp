@@ -11,78 +11,56 @@
 #include <stdio.h>
 #endif
 
-#include <pthread.h>
-#include <vector>
-#include <iostream>
+#include "ThreadPool.h"
 
-class ThreadPool{
-private:
-protected:
-	unsigned short maxThreads;
-public:
-	virtual int allocThread(void* function (void*), void* args = NULL) = 0;
-	virtual void freeThread(int index) = 0;
-	virtual int numOfAvlblThreads() = 0;
-	virtual int getMaxThreads() = 0;
-};
+ThreadPool_v1::ThreadPool_v1(unsigned short max_threads = 8){
 
-class ThreadPool_v1: public ThreadPool{
-
-private:
-	pthread_t* threads;
-	std::vector<unsigned short>* freeThreads; //indexes of free threads
-	//include a list of listeners
-
-protected:
-public:
-	ThreadPool_v1(unsigned short max_threads = 8){
-
-		maxThreads = max_threads;
-		threads = new pthread_t[maxThreads];
-		freeThreads = new std::vector<unsigned short>;
-		for(unsigned short i = 0; i < maxThreads; i++){
-			freeThreads->push_back(i);
-		}
-
+	maxThreads = max_threads;
+	threads = new pthread_t[maxThreads];
+	freeThreads = new std::vector<unsigned short>;
+	for(unsigned short i = 0; i < maxThreads; i++){
+		freeThreads->push_back(i);
 	}
-	~ThreadPool_v1(){
-		delete[] threads;
-		delete freeThreads;
-	}
-	int allocThread(void* function (void*), void* args = NULL){
-		if(!freeThreads->empty()){
-			int threadIndex = freeThreads->at(freeThreads->size()-1);
-			int thread_error = pthread_create(&threads[threadIndex], NULL, 
-				function, args);
-			if(!thread_error){
-				freeThreads->pop_back();
-				return threadIndex;
-			}
-			else{
-				std::cerr << "Error Allocating Thread : " << i << std::endl;
-				return -1;
-			}
+
+}
+ThreadPool_v1::~ThreadPool_v1(){
+	delete[] threads;
+	delete freeThreads;
+}
+int ThreadPool_v1::allocThread(void* function (void*), void* args = NULL){
+	if(!freeThreads->empty()){
+		int threadIndex = freeThreads->at(freeThreads->size()-1);
+		int thread_error = pthread_create(&threads[threadIndex], NULL, 
+			function, args);
+		if(!thread_error){
+			freeThreads->pop_back();
+			return threadIndex;
 		}
 		else{
+			std::cerr << "Error Allocating Thread : " << i << std::endl;
 			return -1;
 		}
 	}
-
-	void freeThread(int threadIndex){
-		pthread_join(threads[threadIndex], NULL);
-		freeThreads->push_back(threadIndex);
-		//update listeners
-		return;
+	else{
+		return -1;
 	}
+}
 
-	int numOfAvlblThreads(){
-		return freeThreads->size();
-	}
+void ThreadPool_v1::freeThread(int threadIndex){
+	pthread_join(threads[threadIndex], NULL);
+	freeThreads->push_back(threadIndex);
+	//update listeners
+	return;
+}
 
-	int getMaxThreads(){
-		return (int)maxThreads;
-	}
-};
+int ThreadPool_v1::numOfAvlblThreads(){
+	return freeThreads->size();
+}
+
+int ThreadPool_v1::getMaxThreads(){
+	return (int)maxThreads;
+}
+
 
 #ifdef DEBUG
 void *overFlow(void*){
