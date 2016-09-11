@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <iostream>
 #include "ConnectionHandler.h"
 #include "ThreadPool.h"
 
