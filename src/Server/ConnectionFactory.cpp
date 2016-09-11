@@ -12,22 +12,21 @@
 
 void EchoConnection::run(){
 	while(threadIndex < 0){
-		threadIndex = deadPool->allocThread(connectionProtocol, NULL);
+		threadIndex = deadPool->allocThread(connectionStart, this);
 	}
 	running = true;
 }
 
-EchoConnection::EchoConnection(int fileDescrptr, ThreadPool* tp){ 
-	connection_fd = fileDescrptr; 
-	deadPool = tp;
-	threadIndex = -1;
+EchoConnection::EchoConnection(int& fileDescrptr, ThreadPool* tp){ 
+	this->connection_fd = fileDescrptr; 
+	this->deadPool = tp;
+	this->threadIndex = -1;
 
 	run();
 }
 
 EchoConnection::~EchoConnection(){
-	deadPool->freeThread(threadIndex);
-	close(connection_fd);
+	
 }
 
 void* EchoConnection::connectionProtocol(){
@@ -50,5 +49,11 @@ void* EchoConnection::connectionProtocol(){
 }
 
 void EchoConnection::endConnection(){
-	~EchoConnection();
+	deadPool->freeThread(threadIndex);
+	close(connection_fd);
+}
+
+Connection* EchoFactory::createConnection(int& fileDescrptr){
+	Connection* connection = new EchoConnection(fileDescrptr, deadPool);
+	return connection;
 }

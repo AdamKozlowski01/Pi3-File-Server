@@ -28,11 +28,11 @@ FileServer_v1::FileServer_v1(){
 	bzero(&servaddr, sizeof(servaddr));
 
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s = htons(INADDR_ANY);
+	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
 	servaddr.sin_port = htons(port);
 		
 	deadPool = new ThreadPool_v1();
-	cHandler = new ConnectionHandler_v1(socket_fd, deadPool);
+	cHandler = new FileConnectionHandler_v1(socket_fd, deadPool);
 
 	bind(socket_fd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 }
@@ -41,12 +41,20 @@ void FileServer_v1::run(){
 	//Starts the server
 	listen(socket_fd, 20);
 	while(true){
-		cHandler.handle();
+		cHandler->handle();
 	}
 
 } 
 
 void FileServer_v1::shutdown(){
 	//safely shuts down the server
-	~FileServer_v1();
+
+	close(socket_fd);
+	delete cHandler;
+	delete deadPool;
 } 
+
+int main(){
+	Server* server = new FileServer_v1();
+	server->run();
+}

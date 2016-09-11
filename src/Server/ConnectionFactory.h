@@ -23,7 +23,7 @@ protected:
 public:
 	virtual void* connectionProtocol() = 0;
 	virtual void endConnection() = 0;
-	friend void* connectionStart(void* arg){
+	static void* connectionStart(void* arg){
 		return static_cast<Connection*>(arg)->connectionProtocol();
 	}
 	bool isRunning(){ 
@@ -39,7 +39,7 @@ private:
 	void run();
 protected:
 public:
-	EchoConnection(int fileDescrptr, ThreadPool* tp);
+	EchoConnection(int& fileDescrptr, ThreadPool* tp);
 	~EchoConnection();
 	void* connectionProtocol();
 	void endConnection();
@@ -60,7 +60,7 @@ class ConnectionFactory{
 private:
 protected:
 public:
-	virtual Connection* createConnection(int fileDescrptr) = 0;
+	virtual Connection* createConnection(int& fileDescrptr) = 0;
 };
 
 class EchoFactory : public ConnectionFactory{
@@ -70,7 +70,7 @@ protected:
 public:
 	EchoFactory(ThreadPool* tp){deadPool = tp;}
 	~EchoFactory();
-	Connection* createConnection(int fileDescrptr);
+	Connection* createConnection(int& fileDescrptr);
 };
 
 class ConnectionFactory_v1 : public ConnectionFactory{

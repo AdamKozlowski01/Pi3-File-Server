@@ -13,7 +13,7 @@
 
 #include "ThreadPool.h"
 
-ThreadPool_v1::ThreadPool_v1(unsigned short max_threads = 8){
+ThreadPool_v1::ThreadPool_v1(unsigned short max_threads){
 
 	maxThreads = max_threads;
 	threads = new pthread_t[maxThreads];
@@ -27,7 +27,7 @@ ThreadPool_v1::~ThreadPool_v1(){
 	delete[] threads;
 	delete freeThreads;
 }
-int ThreadPool_v1::allocThread(void* function (void*), void* args = NULL){
+int ThreadPool_v1::allocThread(void* function (void*), void* args){
 	if(!freeThreads->empty()){
 		int threadIndex = freeThreads->at(freeThreads->size()-1);
 		int thread_error = pthread_create(&threads[threadIndex], NULL, 
@@ -37,7 +37,7 @@ int ThreadPool_v1::allocThread(void* function (void*), void* args = NULL){
 			return threadIndex;
 		}
 		else{
-			std::cerr << "Error Allocating Thread : " << i << std::endl;
+			std::cerr << "Error Allocating Thread : " << threadIndex << std::endl;
 			return -1;
 		}
 	}

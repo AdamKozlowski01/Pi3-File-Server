@@ -12,7 +12,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 #include <vector>
 #include "ThreadPool.h"
 #include "ConnectionFactory.h"
@@ -37,10 +37,9 @@ private:
 	ConnectionFactory* connMaker;
 	std::vector<Connection*>* connections;
 
-	std::string connErrMsg = "Could Not Accept Connection\n";
 protected:
 public:
-	FileConnectionHandler_v1(int socketfd, ThreadPool& tp);
+	FileConnectionHandler_v1(int& socketfd, ThreadPool* tp);
 	~FileConnectionHandler_v1();
 	void handle();
 };
