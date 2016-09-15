@@ -38,13 +38,14 @@ void* EchoConnection::connectionProtocol(){
 
 		read(connection_fd, str, 100);
 
-		if(!(strcmp(str, quitStr)))
+		if(str[0] == quitStr[0] && str[1] == quitStr[1] && str[2] == quitStr[2] && str[3] == quitStr[3])
 			break;
 
 		printf("Echoing back - %s", str);
 		write(connection_fd, str, strlen(str)+1);
 	}
 	running = false;
+	printf("Closing Connection");
 	pthread_exit(NULL);
 }
 

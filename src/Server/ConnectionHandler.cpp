@@ -28,7 +28,7 @@ void FileConnectionHandler_v1::handle(){
 	//handles accept() and requests thread resources
 	conn_fd = accept(socket_fd, (struct sockaddr *) NULL, NULL);
 
-	std::cout << "Connection Accepted\n";
+	std::cout << "Connection Accepted!\n";
 
 	if(conn_fd < 0){
 		std::cerr << connErrMsg;

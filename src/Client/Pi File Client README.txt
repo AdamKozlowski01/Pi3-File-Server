@@ -7,7 +7,7 @@ Client Run:
 		Set up Deffie-Heidman-Exchange-object
 	set up Thread-Pool object
 
-	Client opens connection to the server on port X
+	Client opens connection to the server on port 1081
 
 	Server and Client set up Key-Exchange and AES key which they will use to talk on for the remainder of the session
 
@@ -16,9 +16,9 @@ Client Run:
 	Loop through the following until the server sends "login successful":
 
 		Client sends first a plain-text string (set whole thing toUpper()			(format? UTF-8 for easy Java integration? (Can make that it's own 
-																					connection type for later, which means we 
-																					may need an abstract connection factory on the server for 
-																					different connection types)
+		connection type for later, which means we 
+		may need an abstract connection factory on the server for different 
+		connection types)
 
 	
 		If Client sends "create account" then the server will prompt to create credentials:
